@@ -12,7 +12,7 @@ class MioConan(ConanFile):
     homepage = "https://github.com/mandreyel/mio"
     url = "https://github.com/conan-io/conan-center-index"
     settings = "os", "compiler"
-    no_copy_source = True
+    exports_sources = "patches/**"
 
     @property
     def _source_subfolder(self):
@@ -28,6 +28,10 @@ class MioConan(ConanFile):
     def source(self):
         tools.get(**self.conan_data["sources"][self.version],
                   destination=self._source_subfolder, strip_root=True)
+
+    def build(self):
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
 
     def package(self):
         self.copy("LICENSE", dst="licenses", src=self._source_subfolder)
